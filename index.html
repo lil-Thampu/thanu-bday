@@ -861,11 +861,140 @@
         transition: none;
       }
     }
+
+    /* Loading screen */
+    body.is-loading {
+      overflow: hidden;
+    }
+
+    body.is-loading .chibi-overlay * {
+      animation-play-state: paused !important;
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #fbf7f2;
+      text-align: center;
+    }
+
+    .loading-screen[hidden] {
+      display: none;
+    }
+
+    .loading-content {
+      width: min(100%, 350px);
+    }
+
+    .loading-heart {
+      color: #bd6974;
+      font-size: 3.5rem;
+      animation: loading-beat 1s ease-in-out infinite;
+    }
+
+    .loading-content h2 {
+      margin: 10px 0;
+      color: #342528;
+      font-family: var(--serif);
+      font-size: 2.5rem;
+      font-weight: 500;
+    }
+
+    .loading-content p {
+      color: #76676a;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .loading-track {
+      height: 9px;
+      margin: 24px 0 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #ead8d3;
+    }
+
+    .loading-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #bd6974, #e5a7a8);
+      transition: width 250ms ease;
+    }
+
+    .loading-percent {
+      color: #884651;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .loading-start {
+      margin-top: 20px;
+      padding: 13px 24px;
+      border: 0;
+      border-radius: 999px;
+      background: #bd6974;
+      color: white;
+      font: 700 0.9rem var(--sans);
+      cursor: pointer;
+    }
+
+    .loading-start[hidden] {
+      display: none;
+    }
+
+    @keyframes loading-beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
   </style>
 </head>
+<body class="is-loading">
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <div class="loading-heart" aria-hidden="true">♥</div>
 
-<body>
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+      <h2>Preparing our memories...</h2>
+
+      <p id="loadingMessage">
+        Please wait while our photos load ♡
+      </p>
+
+      <div
+        class="loading-track"
+        id="loadingProgress"
+        role="progressbar"
+        aria-label="Loading photos"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div class="loading-fill" id="loadingFill"></div>
+      </div>
+
+      <div class="loading-percent" id="loadingPercent">0%</div>
+
+      <button
+        class="loading-start"
+        id="loadingStart"
+        type="button"
+        hidden
+      >
+        Start our story ♡
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="scroll-progress"
+    id="scrollProgress"
+    aria-hidden="true"
+  ></div>
 
   <header class="page-intro">
     <span class="eyebrow">
@@ -892,7 +1021,6 @@
           <span class="eyebrow">The good stuff</span>
           <h2>Our favorite <em>moments.</em></h2>
         </div>
-        
       </div>
 
       <div id="memoryContent"></div>
@@ -904,6 +1032,7 @@
           <span class="eyebrow">A few moments in motion</span>
           <h2>Our little <em>films.</em></h2>
         </div>
+
         <p>Portrait videos play muted when you scroll to them.</p>
       </div>
 
@@ -917,16 +1046,24 @@
 
         <div class="letter-copy">
           <p>
-            I hope this year gives you back even a little of the joy, kindness,
-            and love that you give to everyone around you.
+            I hope this year gives you back even a little of the joy,
+            kindness, and love that you give to everyone around you.
           </p>
-          <p>
-            Thank you for being you and for giving me so many moments I want
-            to keep forever. I’m so lucky to have you today and every day.
-          </p>
-          <p>Happy birthday, my shothuu. I love you more than I can fit on this page.</p>
 
-          <div class="letter-signature">Always yours, Naish ♡</div>
+          <p>
+            Thank you for being you and for giving me so many moments
+            I want to keep forever. I’m so lucky to have you today
+            and every day.
+          </p>
+
+          <p>
+            Happy birthday, my shothuu. I love you more than I can fit
+            on this page.
+          </p>
+
+          <div class="letter-signature">
+            Always yours, Naish ♡
+          </div>
         </div>
       </div>
     </section>
@@ -985,12 +1122,16 @@
     <span class="burst-heart b8">♥</span>
   </div>
 
-  <p class="music-notice" id="musicNotice" aria-live="polite" hidden></p>
+  <p
+    class="music-notice"
+    id="musicNotice"
+    aria-live="polite"
+    hidden
+  ></p>
 
   <audio
     id="backgroundMusic"
     src="music/bgm.wav"
-    autoplay
     loop
     preload="auto"
   ></audio>
@@ -1000,13 +1141,17 @@
   <script>
     const TOTAL_PHOTOS = 58;
     const TOTAL_VIDEOS = 6;
+
     const PHOTO_FORMATS = ["webp", "jpg", "jpeg", "png"];
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
     function imageCandidates(fileBase) {
-      return PHOTO_FORMATS.map((extension) => `${fileBase}.${extension}`);
+      return PHOTO_FORMATS.map(
+        (extension) => `${fileBase}.${extension}`
+      );
     }
 
     function setImageWithFallback(image, candidates, onMissing) {
@@ -1015,6 +1160,7 @@
       function tryNext() {
         if (nextCandidate >= candidates.length) {
           image.onerror = null;
+
           if (onMissing) onMissing();
           return;
         }
@@ -1126,15 +1272,22 @@
       return card;
     }
 
-    // Create the 58 photos in rows of three, with a quote after each group.
+    // Create 58 photos in rows of three.
     const photosPerGroup = 12;
     let quoteIndex = 0;
 
-    for (let start = 0; start < TOTAL_PHOTOS; start += photosPerGroup) {
+    for (
+      let start = 0;
+      start < TOTAL_PHOTOS;
+      start += photosPerGroup
+    ) {
       const grid = document.createElement("div");
       grid.className = "photo-grid";
 
-      const end = Math.min(start + photosPerGroup, TOTAL_PHOTOS);
+      const end = Math.min(
+        start + photosPerGroup,
+        TOTAL_PHOTOS
+      );
 
       for (let index = start; index < end; index++) {
         grid.appendChild(createPhoto(index + 1, index));
@@ -1143,7 +1296,10 @@
       memoryContent.appendChild(grid);
 
       if (end < TOTAL_PHOTOS) {
-        memoryContent.appendChild(createQuote(quotes[quoteIndex]));
+        memoryContent.appendChild(
+          createQuote(quotes[quoteIndex])
+        );
+
         quoteIndex++;
       }
     }
@@ -1152,13 +1308,19 @@
     setImageWithFallback(
       document.getElementById("chibiOne"),
       imageCandidates("photos/ch-1"),
-      () => document.getElementById("walkerOne").classList.add("is-missing")
+      () => {
+        document.getElementById("walkerOne")
+          .classList.add("is-missing");
+      }
     );
 
     setImageWithFallback(
       document.getElementById("chibiTwo"),
       imageCandidates("photos/ch-2"),
-      () => document.getElementById("walkerTwo").classList.add("is-missing")
+      () => {
+        document.getElementById("walkerTwo")
+          .classList.add("is-missing");
+      }
     );
 
     const videoTitles = [
@@ -1168,7 +1330,6 @@
       "A little adventure",
       "Just us",
       "Another favorite memory"
-  
     ];
 
     const videoFormats = [
@@ -1193,9 +1354,13 @@
       video.loop = true;
       video.playsInline = true;
       video.preload = "none";
+
       video.setAttribute("muted", "");
       video.setAttribute("playsinline", "");
-      video.setAttribute("aria-label", videoTitles[number - 1]);
+      video.setAttribute(
+        "aria-label",
+        videoTitles[number - 1]
+      );
 
       videoFormats.forEach(({ extension, type }) => {
         const source = document.createElement("source");
@@ -1217,7 +1382,8 @@
 
       const label = document.createElement("p");
       label.className = "video-number";
-      label.textContent = `VIDEO ${String(number).padStart(2, "0")}`;
+      label.textContent =
+        `VIDEO ${String(number).padStart(2, "0")}`;
 
       const title = document.createElement("h3");
       title.textContent = videoTitles[number - 1];
@@ -1227,56 +1393,75 @@
       videosToObserve.push(video);
     }
 
-    // Autoplay videos muted when they are visible; pause off-screen videos.
+    // Play visible videos muted; pause off-screen videos.
     function playVisibleVideo(video) {
       video.muted = true;
 
       const playAttempt = video.play();
-      if (playAttempt && typeof playAttempt.catch === "function") {
+
+      if (
+        playAttempt &&
+        typeof playAttempt.catch === "function"
+      ) {
         playAttempt.catch(() => {});
       }
     }
 
     if ("IntersectionObserver" in window) {
-      const videoObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
-            playVisibleVideo(entry.target);
-          } else {
-            entry.target.pause();
-          }
-        });
-      }, { threshold: [0, 0.4, 1] });
+      const videoObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (
+              entry.isIntersecting &&
+              entry.intersectionRatio >= 0.4
+            ) {
+              playVisibleVideo(entry.target);
+            } else {
+              entry.target.pause();
+            }
+          });
+        },
+        { threshold: [0, 0.4, 1] }
+      );
 
-      videosToObserve.forEach((video) => videoObserver.observe(video));
+      videosToObserve.forEach(
+        (video) => videoObserver.observe(video)
+      );
     } else {
       videosToObserve.forEach(playVisibleVideo);
     }
 
-    // Fade headings, quotes, video cards, and the note into view.
+    // Fade headings, quotes, videos, and the note into view.
     const revealElements = document.querySelectorAll(".reveal");
 
-    if ("IntersectionObserver" in window && !prefersReducedMotion) {
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.06 });
+    if (
+      "IntersectionObserver" in window &&
+      !prefersReducedMotion
+    ) {
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.06 }
+      );
 
-      revealElements.forEach((element) => revealObserver.observe(element));
+      revealElements.forEach(
+        (element) => revealObserver.observe(element)
+      );
     } else {
-      revealElements.forEach((element) => element.classList.add("is-visible"));
+      revealElements.forEach(
+        (element) => element.classList.add("is-visible")
+      );
     }
 
     /*
       Scroll-linked photo animation.
-
-      Each photo begins moving when its center reaches the middle of the screen.
-      Cubic easing gives the movement a gentle curve, while the small vertical
-      arc makes it travel along a curved path from its screen edge.
+      Photos slide in from alternating sides.
     */
     function updatePhotoAnimations() {
       if (prefersReducedMotion) {
@@ -1286,48 +1471,63 @@
           card.style.transform = "none";
           card.dataset.animatedY = "0";
         });
+
         return;
       }
 
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
 
-      // Start at the bottom-third line; finish near the top.
-      // The longer distance makes each photo's animation slower.
       const startLine = viewportHeight * 0.99;
       const finishLine = viewportHeight * 0.50;
-      const animationDistance = Math.max(1, startLine - finishLine);
-      const arcHeight = Math.min(58, viewportHeight * 0.075);
+
+      const animationDistance = Math.max(
+        1,
+        startLine - finishLine
+      );
+
+      const arcHeight = Math.min(
+        58,
+        viewportHeight * 0.075
+      );
 
       photoCards.forEach((card) => {
         const rect = card.getBoundingClientRect();
         const previousY = Number(card.dataset.animatedY || 0);
 
-        // Account for the vertical curve applied on the previous frame.
-        const photoCenter = rect.top - previousY + rect.height / 2;
+        const photoCenter =
+          rect.top - previousY + rect.height / 2;
 
         const progress = Math.max(
           0,
-          Math.min(1, (startLine - photoCenter) / animationDistance)
+          Math.min(
+            1,
+            (startLine - photoCenter) / animationDistance
+          )
         );
 
-        // Smooth, slow start and finish.
         const easedProgress =
           progress < 0.5
             ? 4 * progress * progress * progress
             : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
         const direction = Number(card.dataset.direction) || 1;
-        const travelDistance = viewportWidth + rect.width + 24;
 
-        // Slide in from alternating sides and follow a gentle curved path.
-        const x = direction * travelDistance * (1 - easedProgress);
+        const travelDistance =
+          viewportWidth + rect.width + 24;
+
+        const x =
+          direction * travelDistance * (1 - easedProgress);
+
         const y =
-          Math.sin(Math.PI * easedProgress) * arcHeight * direction;
+          Math.sin(Math.PI * easedProgress) *
+          arcHeight *
+          direction;
 
         card.style.opacity = String(easedProgress);
         card.style.filter = `blur(${(1 - easedProgress) * 4}px)`;
         card.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
         card.dataset.animatedY = String(y);
       });
     }
@@ -1337,7 +1537,8 @@
 
     function updateProgressBar() {
       const maximum =
-        document.documentElement.scrollHeight - window.innerHeight;
+        document.documentElement.scrollHeight -
+        window.innerHeight;
 
       const progress = maximum > 0
         ? Math.min(1, Math.max(0, window.scrollY / maximum))
@@ -1346,37 +1547,61 @@
       progressBar.style.transform = `scaleX(${progress})`;
     }
 
-    // Decorative hearts, sparkles, and petals during scrolling.
-    const decorationLayer = document.getElementById("scrollDecorations");
+    // Decorative hearts, sparkles, and petals while scrolling.
+    const decorationLayer =
+      document.getElementById("scrollDecorations");
 
     const particleTypes = [
-      { className: "heart", symbols: ["♡", "♥", "ღ", "❤", "❥"] },
-      { className: "sparkle", symbols: ["✧", "✦", "⋆", "✴"] },
-      { className: "petal", symbols: ["❀", "✿", "❁"] }
+      {
+        className: "heart",
+        symbols: ["♡", "♥", "ღ", "❤", "❥"]
+      },
+      {
+        className: "sparkle",
+        symbols: ["✧", "✦", "⋆", "✴"]
+      },
+      {
+        className: "petal",
+        symbols: ["❀", "✿", "❁"]
+      }
     ];
 
     function createScrollParticle() {
       const side = Math.random() < 0.5 ? "left" : "right";
+
       const type =
-        particleTypes[Math.floor(Math.random() * particleTypes.length)];
+        particleTypes[
+          Math.floor(Math.random() * particleTypes.length)
+        ];
 
       const particle = document.createElement("span");
+
       particle.className =
         `scroll-particle ${type.className} from-${side}`;
+
       particle.textContent =
-        type.symbols[Math.floor(Math.random() * type.symbols.length)];
+        type.symbols[
+          Math.floor(Math.random() * type.symbols.length)
+        ];
 
       particle.style.top = `${15 + Math.random() * 70}%`;
       particle.style.fontSize = `${18 + Math.random() * 17}px`;
 
       const distance = 55 + Math.random() * 85;
-      const horizontalDrift = side === "left" ? distance : -distance;
 
-      particle.style.setProperty("--drift-x", `${horizontalDrift}px`);
+      const horizontalDrift =
+        side === "left" ? distance : -distance;
+
+      particle.style.setProperty(
+        "--drift-x",
+        `${horizontalDrift}px`
+      );
+
       particle.style.setProperty(
         "--drift-y",
         `-${80 + Math.random() * 120}px`
       );
+
       particle.style.setProperty(
         "--rotation",
         `${-35 + Math.random() * 70}deg`
@@ -1408,9 +1633,11 @@
         updateProgressBar();
 
         const currentY = window.scrollY;
+
         scrollDistanceSinceParticle += Math.abs(
           currentY - lastTrackedScrollY
         );
+
         lastTrackedScrollY = currentY;
 
         const now = performance.now();
@@ -1422,6 +1649,7 @@
         ) {
           scrollDistanceSinceParticle = 0;
           lastParticleTime = now;
+
           createScrollParticle();
 
           if (Math.random() < 0.22) {
@@ -1431,7 +1659,12 @@
       });
     }
 
-    window.addEventListener("scroll", updateOnScroll, { passive: true });
+    window.addEventListener(
+      "scroll",
+      updateOnScroll,
+      { passive: true }
+    );
+
     window.addEventListener("resize", () => {
       updatePhotoAnimations();
       updateProgressBar();
@@ -1440,8 +1673,7 @@
     updatePhotoAnimations();
     updateProgressBar();
 
-    // Try to play the custom song as soon as the site opens.
-    // Browsers may require a tap before allowing sound.
+    // Background music.
     const music = document.getElementById("backgroundMusic");
     const musicNotice = document.getElementById("musicNotice");
 
@@ -1451,7 +1683,12 @@
     }
 
     async function tryPlayingMusic() {
-      if (!music.paused) return;
+      if (
+        document.body.classList.contains("is-loading") ||
+        !music.paused
+      ) {
+        return;
+      }
 
       try {
         await music.play();
@@ -1468,23 +1705,29 @@
     });
 
     music.addEventListener("error", () => {
-      showMusicNotice("Check that music/our-song.mp3 is in your folder.");
+      showMusicNotice(
+        "Check that music/bgm.wav is in your folder."
+      );
     });
 
-    document.addEventListener("pointerdown", tryPlayingMusic, {
-      passive: true
-    });
-    document.addEventListener("keydown", tryPlayingMusic);
-    tryPlayingMusic();
+    document.addEventListener(
+      "pointerdown",
+      tryPlayingMusic,
+      { passive: true }
+    );
 
-    // Automatic scrolling, with a short pause after manual interaction.
+    document.addEventListener(
+      "keydown",
+      tryPlayingMusic
+    );
+
+    // Automatic scrolling with a one-second interaction pause.
     const AUTO_SCROLL_SPEED = 60;
-    let autoScrollPosition = window.scrollY;  // pixels per second
+    let autoScrollPosition = window.scrollY;
     const RESUME_DELAY = 1000;
 
     let autoScrollFrame = 0;
     let autoScrollStartTimer = null;
-
     let autoScrollResumeTimer = null;
     let previousAutoScrollTime = 0;
     let autoScrollFinished = false;
@@ -1504,7 +1747,8 @@
 
       const maximum = Math.max(
         0,
-        document.documentElement.scrollHeight - window.innerHeight
+        document.documentElement.scrollHeight -
+        window.innerHeight
       );
 
       if (maximum <= 1 || window.scrollY >= maximum - 1) {
@@ -1541,18 +1785,33 @@
     }
 
     function startAutoScroll() {
-      if (prefersReducedMotion || autoScrollFinished || autoScrollFrame) {
+      if (document.body.classList.contains("is-loading")) {
+        return;
+      }
+
+      if (
+        prefersReducedMotion ||
+        autoScrollFinished ||
+        autoScrollFrame
+      ) {
         return;
       }
 
       document.documentElement.style.scrollBehavior = "auto";
       autoScrollPosition = window.scrollY;
       previousAutoScrollTime = 0;
+
       autoScrollFrame = requestAnimationFrame(autoScrollStep);
     }
 
     function pauseAndResumeAfterInteraction(event) {
-      if (prefersReducedMotion || autoScrollFinished) return;
+      if (document.body.classList.contains("is-loading")) {
+        return;
+      }
+
+      if (prefersReducedMotion || autoScrollFinished) {
+        return;
+      }
 
       if (
         event.target instanceof Element &&
@@ -1588,11 +1847,13 @@
       pauseAndResumeAfterInteraction,
       { passive: true }
     );
+
     window.addEventListener(
       "touchstart",
       pauseAndResumeAfterInteraction,
       { passive: true }
     );
+
     window.addEventListener(
       "wheel",
       pauseAndResumeAfterInteraction,
@@ -1615,13 +1876,157 @@
       }
     });
 
-    // Begin automatic scrolling after a short pause at the top.
-    if (!prefersReducedMotion) {
-      autoScrollStartTimer = window.setTimeout(() => {
-        autoScrollStartTimer = null;
-        startAutoScroll();
-      }, 3000);
+    // Load the photos before opening the page.
+    const loadingScreen =
+      document.getElementById("loadingScreen");
+
+    const loadingMessage =
+      document.getElementById("loadingMessage");
+
+    const loadingProgress =
+      document.getElementById("loadingProgress");
+
+    const loadingFill =
+      document.getElementById("loadingFill");
+
+    const loadingPercent =
+      document.getElementById("loadingPercent");
+
+    const loadingStart =
+      document.getElementById("loadingStart");
+
+    const imagesToLoad = [
+      ...Array.from(
+        { length: TOTAL_PHOTOS },
+        (_, index) => `photos/${index + 1}`
+      ),
+      "photos/ch-1",
+      "photos/ch-2",
+      "photos/final"
+    ];
+
+    let loadedImageCount = 0;
+    let failedImageCount = 0;
+
+    // Keep references to loaded images while the page is open.
+    const preloadedImages = [];
+
+    function preloadImage(fileBase) {
+      return new Promise((resolve) => {
+        const candidates = imageCandidates(fileBase);
+        const image = new Image();
+
+        let candidateIndex = 0;
+        let timer;
+        let finished = false;
+
+        preloadedImages.push(image);
+
+        function finish(success) {
+          if (finished) return;
+
+          finished = true;
+          clearTimeout(timer);
+
+          image.onload = null;
+          image.onerror = null;
+
+          resolve(success);
+        }
+
+        function tryNext() {
+          clearTimeout(timer);
+
+          if (candidateIndex >= candidates.length) {
+            finish(false);
+            return;
+          }
+
+          const candidate = candidates[candidateIndex++];
+
+          image.onload = () => finish(true);
+          image.onerror = tryNext;
+
+          // Continue if an image request gets stuck.
+          timer = window.setTimeout(tryNext, 15000);
+
+          image.src = candidate;
+        }
+
+        tryNext();
+      });
     }
+
+    function updateLoadingProgress() {
+      const percent = Math.round(
+        (loadedImageCount / imagesToLoad.length) * 100
+      );
+
+      loadingFill.style.width = `${percent}%`;
+      loadingPercent.textContent = `${percent}%`;
+
+      loadingProgress.setAttribute(
+        "aria-valuenow",
+        String(percent)
+      );
+    }
+
+    async function loadMemories() {
+      let nextImage = 0;
+
+      // Load a few images at a time.
+      async function worker() {
+        while (nextImage < imagesToLoad.length) {
+          const fileBase = imagesToLoad[nextImage++];
+          const success = await preloadImage(fileBase);
+
+          if (!success) {
+            failedImageCount++;
+          }
+
+          loadedImageCount++;
+          updateLoadingProgress();
+        }
+      }
+
+      await Promise.all(
+        Array.from({ length: 6 }, () => worker())
+      );
+
+      if (failedImageCount > 0) {
+        loadingMessage.textContent =
+          `${failedImageCount} image(s) could not be loaded. ` +
+          "You can still open the page ♡";
+      } else {
+        loadingMessage.textContent =
+          "Everything is ready for you ♡";
+      }
+
+      loadingStart.hidden = false;
+    }
+
+    loadingStart.addEventListener("click", () => {
+      document.body.classList.remove("is-loading");
+      loadingScreen.hidden = true;
+
+      window.scrollTo(0, 0);
+
+      updatePhotoAnimations();
+      updateProgressBar();
+
+      // The button tap gives the browser a chance to start music.
+      tryPlayingMusic();
+
+      // Begin scrolling three seconds after opening.
+      if (!prefersReducedMotion) {
+        autoScrollStartTimer = window.setTimeout(() => {
+          autoScrollStartTimer = null;
+          startAutoScroll();
+        }, 3000);
+      }
+    });
+
+    loadMemories();
   </script>
 </body>
 </html>
