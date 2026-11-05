@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf7f2">
+  <title>Happy Birthday, Thanuu!</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #fbf7f2;
+      --paper-dark: #f3e9e3;
+      --ink: #342528;
+      --muted: #76676a;
+      --rose: #bd6974;
+      --rose-dark: #884651;
+      --line: rgba(79, 47, 52, 0.12);
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --chibi-height: clamp(242px, 30vh, 208px);
+      --chibi-width: clamp(188px, 22vw, 138px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 420px;
+      margin: 0;
+      padding-bottom: calc(
+        var(--chibi-height) + env(safe-area-inset-bottom, 0px) + 20px
+      );
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ::selection {
+      background: #efced0;
+      color: var(--ink);
+    }
+
+    .scroll-progress {
+      position: fixed;
+      z-index: 100;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #bd6974, #e5a7a8, #c9a36f);
+      transform: scaleX(0);
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    .page-intro {
+      width: min(1080px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: clamp(48px, 8vh, 76px) 0 44px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--rose-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--rose);
+      box-shadow: 0 0 0 4px rgba(189, 105, 116, 0.13);
+    }
+
+    .page-intro h1 {
+      margin: 19px 0 13px;
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 9vw, 6.3rem);
+      font-weight: 500;
+      letter-spacing: -0.05em;
+      line-height: 0.94;
+    }
+
+    .page-intro h1 span {
+      color: var(--rose);
+      font-style: italic;
+    }
+
+    .intro-copy {
+      max-width: 540px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .scroll-cue {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 23px;
+      color: var(--rose-dark);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .scroll-cue span {
+      font-size: 1.2rem;
+    }
+
+    /* Chibis stay at the bottom of the screen while the page scrolls. */
+    .chibi-overlay {
+      position: fixed;
+      right: 0;
+      bottom: env(safe-area-inset-bottom, 0px);
+      left: 0;
+      z-index: 50;
+      height: var(--chibi-height);
+      overflow: hidden;
+      isolation: isolate;
+      background: linear-gradient(
+        to top,
+        rgba(251, 247, 242, 0.93),
+        rgba(251, 247, 242, 0.46) 48%,
+        transparent
+      );
+      pointer-events: none;
+    }
+
+    .scene-ground {
+      position: absolute;
+      right: 7%;
+      bottom: 9px;
+      left: 7%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(136, 70, 81, 0.28) 18%,
+        rgba(136, 70, 81, 0.28) 82%,
+        transparent
+      );
+    }
+
+    .scene-sparkle {
+      position: absolute;
+      z-index: 1;
+      color: #c9a36f;
+      animation: twinkle 1.7s ease-in-out infinite alternate;
+    }
+
+    .scene-sparkle.one {
+      top: 17%;
+      left: 20%;
+      font-size: 1.2rem;
+    }
+
+    .scene-sparkle.two {
+      top: 27%;
+      right: 20%;
+      font-size: 1.4rem;
+      animation-delay: 0.45s;
+    }
+
+    .scene-sparkle.three {
+      top: 51%;
+      left: 34%;
+      font-size: 0.9rem;
+      animation-delay: 0.8s;
+    }
+
+    .walker {
+      position: absolute;
+      bottom: 7px;
+      z-index: 2;
+      width: var(--chibi-width);
+      height: calc(100% - 7px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .walker-left {
+      left: calc(0px - var(--chibi-width));
+      animation: walk-left 2.5s cubic-bezier(0.22, 0.72, 0.2, 1) 0.12s both;
+    }
+
+    .walker-right {
+      right: calc(0px - var(--chibi-width));
+      animation: walk-right 2.5s cubic-bezier(0.22, 0.72, 0.2, 1) 0.12s both;
+    }
+
+    .walker-bob {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      animation: walking-bob 0.4s ease-in-out 0.15s 6;
+    }
+
+    .walker-right .walker-bob {
+      animation-name: walking-bob-reverse;
+    }
+
+    .chibi-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 6px 8px rgba(71, 43, 48, 0.16));
+    }
+
+    /* Remove this rule if chibi-2 already faces left. */
+    .walker-right .chibi-image {
+      transform: scaleX(-1);
+    }
+
+    .chibi-fallback {
+      display: none;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(3.5rem, 8vw, 6rem);
+    }
+
+    .walker.is-missing .chibi-image {
+      display: none;
+    }
+
+    .walker.is-missing .chibi-fallback {
+      display: flex;
+    }
+
+    .meet-love {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      z-index: 4;
+      color: var(--rose);
+      opacity: 0;
+      filter: drop-shadow(0 5px 12px rgba(136, 70, 81, 0.22));
+      transform: translateX(-50%);
+      animation: love-arrive 750ms cubic-bezier(0.2, 1.5, 0.4, 1) 2.45s both;
+    }
+
+    .meet-heart-core {
+      display: block;
+      font-size: clamp(2.8rem, 6vw, 4.3rem);
+      animation: heart-beat 0.95s ease-in-out 3.2s 3;
+    }
+
+    .burst-heart {
+      position: absolute;
+      top: 19%;
+      left: 50%;
+      z-index: 3;
+      color: var(--rose);
+      font-size: 1.35rem;
+      opacity: 0;
+      animation: heart-burst 900ms ease-out var(--delay) both;
+    }
+
+    .burst-heart.b1 { --dx: -52px; --dy: -42px; --delay: 2.55s; }
+    .burst-heart.b2 { --dx: 48px; --dy: -50px; --delay: 2.62s; }
+    .burst-heart.b3 { --dx: -63px; --dy: 12px; --delay: 2.68s; }
+    .burst-heart.b4 { --dx: 62px; --dy: 8px; --delay: 2.58s; }
+    .burst-heart.b5 { --dx: 0px; --dy: -70px; --delay: 2.72s; }
+
+    @keyframes walk-left {
+      from { left: calc(0px - var(--chibi-width)); }
+      to { left: calc(50% - var(--chibi-width) - 10px); }
+    }
+
+    @keyframes walk-right {
+      from { right: calc(0px - var(--chibi-width)); }
+      to { right: calc(50% - var(--chibi-width) - 10px); }
+    }
+
+    @keyframes walking-bob {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      50% { transform: translateY(-5px) rotate(1.5deg); }
+    }
+
+    @keyframes walking-bob-reverse {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      50% { transform: translateY(-5px) rotate(-1.5deg); }
+    }
+
+    @keyframes love-arrive {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 10px) scale(0.15);
+      }
+      65% {
+        opacity: 1;
+        transform: translate(-50%, -5px) scale(1.3);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+      }
+    }
+
+    @keyframes heart-beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.17); }
+    }
+
+    @keyframes heart-burst {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.2);
+      }
+      22% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(1.2);
+      }
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.35; transform: scale(0.8) rotate(0); }
+      to { opacity: 1; transform: scale(1.15) rotate(15deg); }
+    }
+
+    .content-section {
+      width: min(1140px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 35px 0 68px;
+    }
+
+    .section-heading {
+      margin-bottom: 30px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .section-heading h2,
+    .letter-card h2 {
+      margin: 12px 0 0;
+      font-family: var(--serif);
+      font-size: clamp(2.6rem, 5vw, 4rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1.02;
+    }
+
+    .section-heading h2 em {
+      color: var(--rose-dark);
+      font-weight: 500;
+    }
+
+    .section-heading > p {
+      max-width: 330px;
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /*
+      Exactly three photos per row.
+      Photos keep their natural proportions.
+    */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    /*
+      JavaScript moves each photo based on scroll position.
+      They start offscreen and slide into place when their center reaches
+      the middle of the screen.
+    */
+    .photo-card {
+      --photo-direction: -1;
+
+      position: relative;
+      min-width: 0;
+      margin: 0;
+      overflow: hidden;
+      align-self: start;
+      border: 1px solid rgba(79, 47, 52, 0.08);
+      border-radius: 9px;
+      background: #ead8d3;
+      opacity: 0;
+      filter: blur(4px);
+      will-change: transform, opacity, filter;
+    }
+
+    .photo-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: auto 3 / 4;
+    }
+
+    .photo-placeholder {
+      display: none;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      place-items: center;
+      padding: 12px;
+      background: linear-gradient(145deg, #f2e5df, #ead1d0);
+      color: var(--rose-dark);
+      text-align: center;
+      font-size: 0.72rem;
+      line-height: 1.45;
+    }
+
+    .photo-card.is-missing .photo-image {
+      display: none;
+    }
+
+    .photo-card.is-missing .photo-placeholder {
+      display: grid;
+    }
+
+    .quote-card {
+      position: relative;
+      margin: 29px 0 37px;
+      padding: clamp(24px, 5vw, 48px);
+      overflow: hidden;
+      border: 1px solid rgba(136, 70, 81, 0.09);
+      border-radius: 20px;
+      background: linear-gradient(115deg, #f1e1dc, #f8eee8);
+    }
+
+    .quote-card::after {
+      position: absolute;
+      top: -95px;
+      right: 6%;
+      width: 220px;
+      height: 220px;
+      border: 1px solid rgba(136, 70, 81, 0.12);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .quote-card blockquote {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 13px 0 0;
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      font-style: italic;
+      line-height: 1.2;
+    }
+
+    .quote-heart {
+      position: absolute;
+      right: 25px;
+      bottom: 16px;
+      z-index: 1;
+      color: var(--rose);
+      font-size: 2rem;
+    }
+
+    /* Portrait video frames */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+      gap: 22px;
+    }
+
+    .video-card {
+      width: min(100%, 260px);
+      justify-self: center;
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      aspect-ratio: 9 / 16;
+      border-radius: 13px;
+      background: #21191c;
+      box-shadow: 0 8px 22px rgba(60, 35, 40, 0.12);
+    }
+
+    .video-frame video {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #21191c;
+      object-fit: cover;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: linear-gradient(145deg, #f2e5df, #ead1d0);
+      color: var(--rose-dark);
+      text-align: center;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .video-card.is-missing-video video {
+      display: none;
+    }
+
+    .video-card.is-missing-video .video-placeholder {
+      display: grid;
+    }
+
+    .video-number {
+      margin: 13px 0 3px;
+      color: var(--rose-dark);
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .video-card h3 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .letter-section {
+      padding: 28px 18px 78px;
+    }
+
+    .letter-card {
+      position: relative;
+      width: min(790px, 100%);
+      margin: 0 auto;
+      padding: clamp(30px, 7vw, 66px);
+      overflow: hidden;
+      border: 1px solid rgba(136, 70, 81, 0.12);
+      border-radius: 25px;
+      background: var(--paper-dark);
+    }
+
+    .letter-card::after {
+      position: absolute;
+      right: -55px;
+      bottom: -115px;
+      width: 250px;
+      height: 250px;
+      border: 1px solid rgba(136, 70, 81, 0.12);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .letter-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      margin-top: 22px;
+      color: #67575a;
+      font-size: 1rem;
+      line-height: 1.9;
+    }
+
+    .letter-copy p {
+      margin: 0 0 14px;
+    }
+
+    .letter-signature {
+      margin-top: 22px;
+      color: var(--rose-dark);
+      font-family: var(--serif);
+      font-size: 1.65rem;
+      font-style: italic;
+    }
+
+    .page-footer {
+      padding: 0 18px 32px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    .page-footer span {
+      color: var(--rose);
+    }
+
+    /* Full-screen photo at the end of the page. */
+    .final-photo-screen {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: #342528;
+      margin-bottom: calc(
+        0px - var(--chibi-height) - env(safe-area-inset-bottom, 0px) - 20px
+      );
+    }
+
+    .final-photo-screen img {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .final-photo-screen.is-missing-final img {
+      display: none;
+    }
+
+    .final-photo-screen.is-missing-final::after {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--paper-dark);
+      color: var(--rose-dark);
+      content: "Add photos/final.webp (or .jpg, .jpeg, or .png)";
+      text-align: center;
+    }
+
+    /* Keep the final photo unobstructed. */
+    body.final-photo-visible .chibi-overlay,
+    body.final-photo-visible #scrollDecorations,
+    body.final-photo-visible #scrollProgress,
+    body.final-photo-visible .music-notice {
+      visibility: hidden;
+    }
+
+    /* Fade other page sections into view. */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 650ms ease, transform 650ms ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hearts, sparkles, and petals float in from the screen sides. */
+    #scrollDecorations {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .scroll-particle {
+      position: absolute;
+      font-family: Georgia, serif;
+      line-height: 1;
+      animation: particle-float 2.8s ease-out forwards;
+      will-change: transform, opacity;
+    }
+
+    .scroll-particle.from-left {
+      left: -25px;
+    }
+
+    .scroll-particle.from-right {
+      right: -25px;
+    }
+
+    .scroll-particle.heart {
+      color: var(--rose);
+      text-shadow: 0 3px 12px rgba(136, 70, 81, 0.24);
+    }
+
+    .scroll-particle.sparkle {
+      color: #c9a36f;
+    }
+
+    .scroll-particle.petal {
+      color: #d6949b;
+    }
+
+    @keyframes particle-float {
+      0% {
+        opacity: 0;
+        transform: translate(0, 16px) scale(0.55) rotate(0);
+      }
+      16% {
+        opacity: 0.9;
+      }
+      100% {
+        opacity: 0;
+        transform:
+          translate(var(--drift-x), var(--drift-y))
+          scale(1.2)
+          rotate(var(--rotation));
+      }
+    }
+
+    /* Music message appears only if the browser blocks autoplay. */
+    .music-notice {
+      position: fixed;
+      right: 12px;
+      bottom: calc(
+        var(--chibi-height) + 8px + env(safe-area-inset-bottom, 0px)
+      );
+      left: 12px;
+      z-index: 60;
+      width: max-content;
+      max-width: calc(100% - 24px);
+      margin: 0 auto;
+      padding: 11px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 253, 251, 0.96);
+      box-shadow: 0 8px 25px rgba(48, 30, 34, 0.13);
+      color: var(--ink);
+      font-size: 0.8rem;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .music-notice[hidden] {
+      display: none;
+    }
+
+    #backgroundMusic {
+      display: none;
+    }
+
+    @media (max-width: 800px) {
+      .video-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page-intro {
+        padding-top: 45px;
+      }
+
+      .content-section {
+        width: calc(100% - 20px);
+      }
+
+      .section-heading {
+        align-items: start;
+        flex-direction: column;
+        gap: 11px;
+      }
+
+      .section-heading > p {
+        max-width: 480px;
+      }
+
+      .photo-grid {
+        gap: 6px;
+      }
+
+      .photo-card {
+        border-radius: 7px;
+      }
+
+      .quote-card {
+        margin: 23px 0 29px;
+      }
+
+      .quote-heart {
+        right: 17px;
+        bottom: 12px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      :root {
+        --chibi-height: clamp(128px, 21vh, 170px);
+        --chibi-width: clamp(78px, 20vw, 105px);
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .video-card {
+        width: min(100%, 260px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      #scrollDecorations {
+        display: none;
+      }
+
+      .walker-left {
+        left: calc(50% - var(--chibi-width) - 10px);
+        animation: none;
+      }
+
+      .walker-right {
+        right: calc(50% - var(--chibi-width) - 10px);
+        animation: none;
+      }
+
+      .walker-bob,
+      .scene-sparkle,
+      .meet-heart-core {
+        animation: none;
+      }
+
+      .meet-love {
+        opacity: 1;
+        animation: none;
+        transform: translateX(-50%);
+      }
+
+      .burst-heart {
+        display: none;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <header class="page-intro">
+    <span class="eyebrow">
+      <span class="eyebrow-dot" aria-hidden="true"></span>
+      A little celebration of you
+    </span>
+
+    <h1>Happy birthday,<br><span>Thanuu</span></h1>
+
+    <p class="intro-copy">
+      58 little memories, 6 little films, and all our little moments.
+    </p>
+
+    <a class="scroll-cue" href="#memories">
+      <span aria-hidden="true">♡</span>
+      Scroll through our memories ↓
+    </a>
+  </header>
+
+  <main>
+    <section class="content-section" id="memories">
+      <div class="section-heading reveal">
+        <div>
+          <span class="eyebrow">The good stuff</span>
+          <h2>Our favorite <em>moments.</em></h2>
+        </div>
+        
+      </div>
+
+      <div id="memoryContent"></div>
+    </section>
+
+    <section class="content-section" id="videos">
+      <div class="section-heading reveal">
+        <div>
+          <span class="eyebrow">A few moments in motion</span>
+          <h2>Our little <em>films.</em></h2>
+        </div>
+        <p>Portrait videos play muted when you scroll to them.</p>
+      </div>
+
+      <div class="video-grid" id="videoGrid"></div>
+    </section>
+
+    <section class="letter-section" id="letter">
+      <div class="letter-card reveal">
+        <span class="eyebrow">One more thing...</span>
+        <h2>A birthday note for Thanuu...</h2>
+
+        <div class="letter-copy">
+          <p>
+            I hope this year gives you back even a little of the joy, kindness,
+            and love that you give to everyone around you.
+          </p>
+          <p>
+            Thank you for being you and for giving me so many moments I want
+            to keep forever. I’m so lucky to have you today and every day.
+          </p>
+          <p>Happy birthday, my shothuu. I love you more than I can fit on this page.</p>
+
+          <div class="letter-signature">Always yours, Naish ♡</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    Made with <span aria-label="love">♥</span>, just for you.
+  </footer>
+
+  <section
+    class="final-photo-screen"
+    id="finalPhoto"
+    aria-label="One last favorite photo"
+  >
+    <img
+      id="finalPhotoImage"
+      alt="A favorite photo of Thanuu"
+      loading="eager"
+      decoding="async"
+    >
+  </section>
+
+  <!-- Fixed chibi foreground layer -->
+  <div class="chibi-overlay" aria-hidden="true">
+    <div class="scene-ground"></div>
+
+    <span class="scene-sparkle one">✦</span>
+    <span class="scene-sparkle two">✧</span>
+    <span class="scene-sparkle three">✦</span>
+
+    <div class="walker walker-left" id="walkerOne">
+      <div class="walker-bob">
+        <img class="chibi-image" id="chibiOne" alt="">
+        <span class="chibi-fallback"></span>
+      </div>
+    </div>
+
+    <div class="walker walker-right" id="walkerTwo">
+      <div class="walker-bob">
+        <img class="chibi-image" id="chibiTwo" alt="">
+        <span class="chibi-fallback"></span>
+      </div>
+    </div>
+
+    <div class="meet-love">
+      <span class="meet-heart-core">♥</span>
+    </div>
+
+    <span class="burst-heart b1">♡</span>
+    <span class="burst-heart b2">♥</span>
+    <span class="burst-heart b3">♡</span>
+    <span class="burst-heart b4">♥</span>
+    <span class="burst-heart b5">♡</span>
+    <span class="burst-heart b6">♥</span>
+    <span class="burst-heart b7">♡</span>
+    <span class="burst-heart b8">♥</span>
+  </div>
+
+  <p class="music-notice" id="musicNotice" aria-live="polite" hidden></p>
+
+  <audio
+    id="backgroundMusic"
+    src="music/bgm.wav"
+    autoplay
+    loop
+    preload="auto"
+  ></audio>
+
+  <div id="scrollDecorations" aria-hidden="true"></div>
+
+  <script>
+    const TOTAL_PHOTOS = 58;
+    const TOTAL_VIDEOS = 6;
+    const PHOTO_FORMATS = ["webp", "jpg", "jpeg", "png"];
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    function imageCandidates(fileBase) {
+      return PHOTO_FORMATS.map((extension) => `${fileBase}.${extension}`);
+    }
+
+    function setImageWithFallback(image, candidates, onMissing) {
+      let nextCandidate = 0;
+
+      function tryNext() {
+        if (nextCandidate >= candidates.length) {
+          image.onerror = null;
+          if (onMissing) onMissing();
+          return;
+        }
+
+        image.src = candidates[nextCandidate];
+        nextCandidate++;
+      }
+
+      image.onerror = tryNext;
+      tryNext();
+    }
+
+    const finalPhotoSection = document.getElementById("finalPhoto");
+    const finalPhotoImage = document.getElementById("finalPhotoImage");
+
+    setImageWithFallback(
+      finalPhotoImage,
+      imageCandidates("photos/final"),
+      () => finalPhotoSection.classList.add("is-missing-final")
+    );
+
+    if ("IntersectionObserver" in window) {
+      const finalPhotoObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            document.body.classList.toggle(
+              "final-photo-visible",
+              entry.isIntersecting && entry.intersectionRatio >= 0.5
+            );
+          });
+        },
+        { threshold: [0, 0.5] }
+      );
+
+      finalPhotoObserver.observe(finalPhotoSection);
+    }
+
+    const quotes = [
+      '"You make the ordinary parts of life feel extraordinary."',
+      '"Of all the places in the world, my favorite is beside you."',
+      '"Your laugh is one of my favorite sounds."',
+      '"Every year with you becomes my new favorite year."'
+    ];
+
+    const memoryContent = document.getElementById("memoryContent");
+    const photoCards = [];
+
+    function createPhoto(number, index) {
+      const direction = index % 2 === 0 ? -1 : 1;
+      const card = document.createElement("figure");
+
+      card.className = "photo-card";
+      card.dataset.direction = String(direction);
+      card.dataset.animatedY = "0";
+
+      // Start each photo beyond alternating sides of the screen.
+      card.style.opacity = "0";
+      card.style.filter = "blur(4px)";
+      card.style.transform =
+        `translate3d(${direction * 110}vw, 0, 0)`;
+
+      const image = document.createElement("img");
+      image.className = "photo-image";
+      image.alt = `Memory photo ${number}`;
+      image.loading = number <= 9 ? "eager" : "lazy";
+      image.decoding = "async";
+
+      image.addEventListener("load", () => {
+        requestAnimationFrame(updatePhotoAnimations);
+      });
+
+      const placeholder = document.createElement("span");
+      placeholder.className = "photo-placeholder";
+      placeholder.textContent =
+        `Add photos/${number}.webp, .jpg, .jpeg, or .png.`;
+
+      card.append(image, placeholder);
+
+      setImageWithFallback(
+        image,
+        imageCandidates(`photos/${number}`),
+        () => {
+          card.classList.add("is-missing");
+          requestAnimationFrame(updatePhotoAnimations);
+        }
+      );
+
+      photoCards.push(card);
+      return card;
+    }
+
+    function createQuote(text) {
+      const card = document.createElement("aside");
+      card.className = "quote-card reveal";
+
+      const label = document.createElement("span");
+      label.className = "eyebrow";
+      label.textContent = "A little reminder for you";
+
+      const quote = document.createElement("blockquote");
+      quote.textContent = text;
+
+      const heart = document.createElement("span");
+      heart.className = "quote-heart";
+      heart.setAttribute("aria-hidden", "true");
+      heart.textContent = "♡";
+
+      card.append(label, quote, heart);
+      return card;
+    }
+
+    // Create the 58 photos in rows of three, with a quote after each group.
+    const photosPerGroup = 12;
+    let quoteIndex = 0;
+
+    for (let start = 0; start < TOTAL_PHOTOS; start += photosPerGroup) {
+      const grid = document.createElement("div");
+      grid.className = "photo-grid";
+
+      const end = Math.min(start + photosPerGroup, TOTAL_PHOTOS);
+
+      for (let index = start; index < end; index++) {
+        grid.appendChild(createPhoto(index + 1, index));
+      }
+
+      memoryContent.appendChild(grid);
+
+      if (end < TOTAL_PHOTOS) {
+        memoryContent.appendChild(createQuote(quotes[quoteIndex]));
+        quoteIndex++;
+      }
+    }
+
+    // Transparent WebP or PNG chibi cutouts work best.
+    setImageWithFallback(
+      document.getElementById("chibiOne"),
+      imageCandidates("photos/ch-1"),
+      () => document.getElementById("walkerOne").classList.add("is-missing")
+    );
+
+    setImageWithFallback(
+      document.getElementById("chibiTwo"),
+      imageCandidates("photos/ch-2"),
+      () => document.getElementById("walkerTwo").classList.add("is-missing")
+    );
+
+    const videoTitles = [
+      "Our happy little moments",
+      "A day I wish I could replay",
+      "Your laugh, captured",
+      "A little adventure",
+      "Just us",
+      "Another favorite memory"
+  
+    ];
+
+    const videoFormats = [
+      { extension: "mp4", type: "video/mp4" },
+      { extension: "webm", type: "video/webm" }
+    ];
+
+    const videoGrid = document.getElementById("videoGrid");
+    const videosToObserve = [];
+
+    for (let number = 1; number <= TOTAL_VIDEOS; number++) {
+      const card = document.createElement("article");
+      card.className = "video-card reveal";
+
+      const frame = document.createElement("div");
+      frame.className = "video-frame";
+
+      const video = document.createElement("video");
+      video.controls = true;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "none";
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("aria-label", videoTitles[number - 1]);
+
+      videoFormats.forEach(({ extension, type }) => {
+        const source = document.createElement("source");
+        source.src = `videos/${number}.${extension}`;
+        source.type = type;
+        video.appendChild(source);
+      });
+
+      video.addEventListener("error", () => {
+        card.classList.add("is-missing-video");
+      });
+
+      const placeholder = document.createElement("div");
+      placeholder.className = "video-placeholder";
+      placeholder.textContent =
+        `Add videos/${number}.mp4 or videos/${number}.webm.`;
+
+      frame.append(video, placeholder);
+
+      const label = document.createElement("p");
+      label.className = "video-number";
+      label.textContent = `VIDEO ${String(number).padStart(2, "0")}`;
+
+      const title = document.createElement("h3");
+      title.textContent = videoTitles[number - 1];
+
+      card.append(frame, label, title);
+      videoGrid.appendChild(card);
+      videosToObserve.push(video);
+    }
+
+    // Autoplay videos muted when they are visible; pause off-screen videos.
+    function playVisibleVideo(video) {
+      video.muted = true;
+
+      const playAttempt = video.play();
+      if (playAttempt && typeof playAttempt.catch === "function") {
+        playAttempt.catch(() => {});
+      }
+    }
+
+    if ("IntersectionObserver" in window) {
+      const videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+            playVisibleVideo(entry.target);
+          } else {
+            entry.target.pause();
+          }
+        });
+      }, { threshold: [0, 0.4, 1] });
+
+      videosToObserve.forEach((video) => videoObserver.observe(video));
+    } else {
+      videosToObserve.forEach(playVisibleVideo);
+    }
+
+    // Fade headings, quotes, video cards, and the note into view.
+    const revealElements = document.querySelectorAll(".reveal");
+
+    if ("IntersectionObserver" in window && !prefersReducedMotion) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06 });
+
+      revealElements.forEach((element) => revealObserver.observe(element));
+    } else {
+      revealElements.forEach((element) => element.classList.add("is-visible"));
+    }
+
+    /*
+      Scroll-linked photo animation.
+
+      Each photo begins moving when its center reaches the middle of the screen.
+      Cubic easing gives the movement a gentle curve, while the small vertical
+      arc makes it travel along a curved path from its screen edge.
+    */
+    function updatePhotoAnimations() {
+      if (prefersReducedMotion) {
+        photoCards.forEach((card) => {
+          card.style.opacity = "1";
+          card.style.filter = "none";
+          card.style.transform = "none";
+          card.dataset.animatedY = "0";
+        });
+        return;
+      }
+
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+
+      // Start at the bottom-third line; finish near the top.
+      // The longer distance makes each photo's animation slower.
+      const startLine = viewportHeight * 0.99;
+      const finishLine = viewportHeight * 0.50;
+      const animationDistance = Math.max(1, startLine - finishLine);
+      const arcHeight = Math.min(58, viewportHeight * 0.075);
+
+      photoCards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        const previousY = Number(card.dataset.animatedY || 0);
+
+        // Account for the vertical curve applied on the previous frame.
+        const photoCenter = rect.top - previousY + rect.height / 2;
+
+        const progress = Math.max(
+          0,
+          Math.min(1, (startLine - photoCenter) / animationDistance)
+        );
+
+        // Smooth, slow start and finish.
+        const easedProgress =
+          progress < 0.5
+            ? 4 * progress * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        const direction = Number(card.dataset.direction) || 1;
+        const travelDistance = viewportWidth + rect.width + 24;
+
+        // Slide in from alternating sides and follow a gentle curved path.
+        const x = direction * travelDistance * (1 - easedProgress);
+        const y =
+          Math.sin(Math.PI * easedProgress) * arcHeight * direction;
+
+        card.style.opacity = String(easedProgress);
+        card.style.filter = `blur(${(1 - easedProgress) * 4}px)`;
+        card.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        card.dataset.animatedY = String(y);
+      });
+    }
+
+    // Scroll progress bar.
+    const progressBar = document.getElementById("scrollProgress");
+
+    function updateProgressBar() {
+      const maximum =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      const progress = maximum > 0
+        ? Math.min(1, Math.max(0, window.scrollY / maximum))
+        : 0;
+
+      progressBar.style.transform = `scaleX(${progress})`;
+    }
+
+    // Decorative hearts, sparkles, and petals during scrolling.
+    const decorationLayer = document.getElementById("scrollDecorations");
+
+    const particleTypes = [
+      { className: "heart", symbols: ["♡", "♥", "ღ", "❤", "❥"] },
+      { className: "sparkle", symbols: ["✧", "✦", "⋆", "✴"] },
+      { className: "petal", symbols: ["❀", "✿", "❁"] }
+    ];
+
+    function createScrollParticle() {
+      const side = Math.random() < 0.5 ? "left" : "right";
+      const type =
+        particleTypes[Math.floor(Math.random() * particleTypes.length)];
+
+      const particle = document.createElement("span");
+      particle.className =
+        `scroll-particle ${type.className} from-${side}`;
+      particle.textContent =
+        type.symbols[Math.floor(Math.random() * type.symbols.length)];
+
+      particle.style.top = `${15 + Math.random() * 70}%`;
+      particle.style.fontSize = `${18 + Math.random() * 17}px`;
+
+      const distance = 55 + Math.random() * 85;
+      const horizontalDrift = side === "left" ? distance : -distance;
+
+      particle.style.setProperty("--drift-x", `${horizontalDrift}px`);
+      particle.style.setProperty(
+        "--drift-y",
+        `-${80 + Math.random() * 120}px`
+      );
+      particle.style.setProperty(
+        "--rotation",
+        `${-35 + Math.random() * 70}deg`
+      );
+
+      decorationLayer.appendChild(particle);
+
+      particle.addEventListener(
+        "animationend",
+        () => particle.remove(),
+        { once: true }
+      );
+
+      window.setTimeout(() => particle.remove(), 3200);
+    }
+
+    let scrollFrame = 0;
+    let lastTrackedScrollY = window.scrollY;
+    let scrollDistanceSinceParticle = 0;
+    let lastParticleTime = 0;
+
+    function updateOnScroll() {
+      if (scrollFrame) return;
+
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+
+        updatePhotoAnimations();
+        updateProgressBar();
+
+        const currentY = window.scrollY;
+        scrollDistanceSinceParticle += Math.abs(
+          currentY - lastTrackedScrollY
+        );
+        lastTrackedScrollY = currentY;
+
+        const now = performance.now();
+
+        if (
+          !prefersReducedMotion &&
+          scrollDistanceSinceParticle >= 45 &&
+          now - lastParticleTime >= 300
+        ) {
+          scrollDistanceSinceParticle = 0;
+          lastParticleTime = now;
+          createScrollParticle();
+
+          if (Math.random() < 0.22) {
+            window.setTimeout(createScrollParticle, 100);
+          }
+        }
+      });
+    }
+
+    window.addEventListener("scroll", updateOnScroll, { passive: true });
+    window.addEventListener("resize", () => {
+      updatePhotoAnimations();
+      updateProgressBar();
+    });
+
+    updatePhotoAnimations();
+    updateProgressBar();
+
+    // Try to play the custom song as soon as the site opens.
+    // Browsers may require a tap before allowing sound.
+    const music = document.getElementById("backgroundMusic");
+    const musicNotice = document.getElementById("musicNotice");
+
+    function showMusicNotice(message) {
+      musicNotice.textContent = message;
+      musicNotice.hidden = false;
+    }
+
+    async function tryPlayingMusic() {
+      if (!music.paused) return;
+
+      try {
+        await music.play();
+        musicNotice.hidden = true;
+      } catch {
+        showMusicNotice(
+          "Autoplay was blocked — tap anywhere to start our song ♫"
+        );
+      }
+    }
+
+    music.addEventListener("playing", () => {
+      musicNotice.hidden = true;
+    });
+
+    music.addEventListener("error", () => {
+      showMusicNotice("Check that music/our-song.mp3 is in your folder.");
+    });
+
+    document.addEventListener("pointerdown", tryPlayingMusic, {
+      passive: true
+    });
+    document.addEventListener("keydown", tryPlayingMusic);
+    tryPlayingMusic();
+
+    // Automatic scrolling, with a short pause after manual interaction.
+    const AUTO_SCROLL_SPEED = 60;
+    let autoScrollPosition = window.scrollY;  // pixels per second
+    const RESUME_DELAY = 1000;
+
+    let autoScrollFrame = 0;
+    let autoScrollStartTimer = null;
+
+    let autoScrollResumeTimer = null;
+    let previousAutoScrollTime = 0;
+    let autoScrollFinished = false;
+
+    function stopAutoScrollAtPageEnd() {
+      autoScrollFinished = true;
+      autoScrollFrame = 0;
+      previousAutoScrollTime = 0;
+      document.documentElement.style.scrollBehavior = "";
+    }
+
+    function autoScrollStep(time) {
+      if (autoScrollFinished) {
+        autoScrollFrame = 0;
+        return;
+      }
+
+      const maximum = Math.max(
+        0,
+        document.documentElement.scrollHeight - window.innerHeight
+      );
+
+      if (maximum <= 1 || window.scrollY >= maximum - 1) {
+        window.scrollTo(0, maximum);
+        stopAutoScrollAtPageEnd();
+        return;
+      }
+
+      if (previousAutoScrollTime === 0) {
+        previousAutoScrollTime = time;
+      }
+
+      const seconds = Math.min(
+        (time - previousAutoScrollTime) / 1000,
+        0.05
+      );
+
+      previousAutoScrollTime = time;
+
+      autoScrollPosition = Math.min(
+        maximum,
+        autoScrollPosition + AUTO_SCROLL_SPEED * seconds
+      );
+
+      window.scrollTo(0, autoScrollPosition);
+
+      if (autoScrollPosition >= maximum - 1) {
+        window.scrollTo(0, maximum);
+        stopAutoScrollAtPageEnd();
+        return;
+      }
+
+      autoScrollFrame = requestAnimationFrame(autoScrollStep);
+    }
+
+    function startAutoScroll() {
+      if (prefersReducedMotion || autoScrollFinished || autoScrollFrame) {
+        return;
+      }
+
+      document.documentElement.style.scrollBehavior = "auto";
+      autoScrollPosition = window.scrollY;
+      previousAutoScrollTime = 0;
+      autoScrollFrame = requestAnimationFrame(autoScrollStep);
+    }
+
+    function pauseAndResumeAfterInteraction(event) {
+      if (prefersReducedMotion || autoScrollFinished) return;
+
+      if (
+        event.target instanceof Element &&
+        event.target.closest("#autoScrollToggle")
+      ) {
+        return;
+      }
+
+      if (autoScrollStartTimer !== null) {
+        clearTimeout(autoScrollStartTimer);
+        autoScrollStartTimer = null;
+      }
+
+      if (autoScrollFrame) {
+        cancelAnimationFrame(autoScrollFrame);
+        autoScrollFrame = 0;
+      }
+
+      previousAutoScrollTime = 0;
+
+      if (autoScrollResumeTimer !== null) {
+        clearTimeout(autoScrollResumeTimer);
+      }
+
+      autoScrollResumeTimer = window.setTimeout(() => {
+        autoScrollResumeTimer = null;
+        startAutoScroll();
+      }, RESUME_DELAY);
+    }
+
+    window.addEventListener(
+      "pointerdown",
+      pauseAndResumeAfterInteraction,
+      { passive: true }
+    );
+    window.addEventListener(
+      "touchstart",
+      pauseAndResumeAfterInteraction,
+      { passive: true }
+    );
+    window.addEventListener(
+      "wheel",
+      pauseAndResumeAfterInteraction,
+      { passive: true }
+    );
+
+    window.addEventListener("keydown", (event) => {
+      const scrollingKeys = [
+        "ArrowDown",
+        "ArrowUp",
+        "PageDown",
+        "PageUp",
+        "Home",
+        "End",
+        " "
+      ];
+
+      if (scrollingKeys.includes(event.key)) {
+        pauseAndResumeAfterInteraction(event);
+      }
+    });
+
+    // Begin automatic scrolling after a short pause at the top.
+    if (!prefersReducedMotion) {
+      autoScrollStartTimer = window.setTimeout(() => {
+        autoScrollStartTimer = null;
+        startAutoScroll();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
