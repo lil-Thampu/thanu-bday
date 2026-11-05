@@ -971,6 +971,17 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.15); }
     }
+    /* Keep the page sized to the mobile screen */
+html,
+body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: clip;
+}
   </style>
 </head>
 <body class="is-loading">
