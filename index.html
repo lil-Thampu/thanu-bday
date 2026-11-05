@@ -861,7 +861,24 @@
         transition: none;
       }
     }
+    /* Extra mobile sizing */
+@media (max-width: 540px) {
+  .page-intro h1 {
+    font-size: clamp(2.6rem, 12vw, 3.5rem);
+    overflow-wrap: anywhere;
+  }
 
+  .section-heading h2,
+  .letter-card h2 {
+    font-size: clamp(2.2rem, 10vw, 2.6rem);
+    overflow-wrap: anywhere;
+  }
+
+  .music-notice {
+    width: auto;
+    overflow-wrap: anywhere;
+  }
+}
     /* Loading screen */
     body.is-loading {
       overflow: hidden;
@@ -1877,156 +1894,255 @@
     });
 
     // Load the photos before opening the page.
-    const loadingScreen =
-      document.getElementById("loadingScreen");
+    // Load photos, videos, and music before opening the page.
+const loadingScreen =
+  document.getElementById("loadingScreen");
 
-    const loadingMessage =
-      document.getElementById("loadingMessage");
+const loadingMessage =
+  document.getElementById("loadingMessage");
 
-    const loadingProgress =
-      document.getElementById("loadingProgress");
+const loadingProgress =
+  document.getElementById("loadingProgress");
 
-    const loadingFill =
-      document.getElementById("loadingFill");
+const loadingFill =
+  document.getElementById("loadingFill");
 
-    const loadingPercent =
-      document.getElementById("loadingPercent");
+const loadingPercent =
+  document.getElementById("loadingPercent");
 
-    const loadingStart =
-      document.getElementById("loadingStart");
+const loadingStart =
+  document.getElementById("loadingStart");
 
-    const imagesToLoad = [
-      ...Array.from(
-        { length: TOTAL_PHOTOS },
-        (_, index) => `photos/${index + 1}`
-      ),
-      "photos/ch-1",
-      "photos/ch-2",
-      "photos/final"
-    ];
+const imagesToLoad = [
+  ...Array.from(
+    { length: TOTAL_PHOTOS },
+    (_, index) => `photos/${index + 1}`
+  ),
+  "photos/ch-1",
+  "photos/ch-2",
+  "photos/final"
+];
 
-    let loadedImageCount = 0;
-    let failedImageCount = 0;
+// Keep references to the loaded images and media.
+const preloadedImages = [];
+const preloadedMediaUrls = [];
 
-    // Keep references to loaded images while the page is open.
-    const preloadedImages = [];
+let completedItems = 0;
+let failedItems = 0;
 
-    function preloadImage(fileBase) {
-      return new Promise((resolve) => {
-        const candidates = imageCandidates(fileBase);
-        const image = new Image();
+const totalItems =
+  imagesToLoad.length + TOTAL_VIDEOS + 1;
 
-        let candidateIndex = 0;
-        let timer;
-        let finished = false;
+function updateLoadingProgress() {
+  const percent = Math.round(
+    (completedItems / totalItems) * 100
+  );
 
-        preloadedImages.push(image);
+  loadingFill.style.width = `${percent}%`;
+  loadingPercent.textContent = `${percent}%`;
 
-        function finish(success) {
-          if (finished) return;
+  loadingProgress.setAttribute(
+    "aria-valuenow",
+    String(percent)
+  );
+}
 
-          finished = true;
-          clearTimeout(timer);
+function markCompleted(success) {
+  if (!success) {
+    failedItems++;
+  }
 
-          image.onload = null;
-          image.onerror = null;
+  completedItems++;
+  updateLoadingProgress();
+}
 
-          resolve(success);
-        }
+function preloadImage(fileBase) {
+  return new Promise((resolve) => {
+    const candidates = imageCandidates(fileBase);
+    const image = new Image();
 
-        function tryNext() {
-          clearTimeout(timer);
+    let candidateIndex = 0;
+    let timer;
+    let finished = false;
 
-          if (candidateIndex >= candidates.length) {
-            finish(false);
-            return;
-          }
+    preloadedImages.push(image);
 
-          const candidate = candidates[candidateIndex++];
+    function finish(success) {
+      if (finished) return;
 
-          image.onload = () => finish(true);
-          image.onerror = tryNext;
+      finished = true;
+      clearTimeout(timer);
 
-          // Continue if an image request gets stuck.
-          timer = window.setTimeout(tryNext, 15000);
+      image.onload = null;
+      image.onerror = null;
 
-          image.src = candidate;
-        }
-
-        tryNext();
-      });
+      resolve(success);
     }
 
-    function updateLoadingProgress() {
-      const percent = Math.round(
-        (loadedImageCount / imagesToLoad.length) * 100
-      );
+    function tryNext() {
+      if (finished) return;
 
-      loadingFill.style.width = `${percent}%`;
-      loadingPercent.textContent = `${percent}%`;
+      clearTimeout(timer);
 
-      loadingProgress.setAttribute(
-        "aria-valuenow",
-        String(percent)
-      );
+      if (candidateIndex >= candidates.length) {
+        finish(false);
+        return;
+      }
+
+      const candidate = candidates[candidateIndex++];
+
+      image.onload = () => finish(true);
+      image.onerror = tryNext;
+
+      timer = window.setTimeout(tryNext, 30000);
+      image.src = candidate;
     }
 
-    async function loadMemories() {
-      let nextImage = 0;
+    tryNext();
+  });
+}
 
-      // Load a few images at a time.
-      async function worker() {
-        while (nextImage < imagesToLoad.length) {
-          const fileBase = imagesToLoad[nextImage++];
-          const success = await preloadImage(fileBase);
+// Download a complete media file and return a local URL for playback.
+async function downloadMedia(url) {
+  const controller = new AbortController();
 
-          if (!success) {
-            failedImageCount++;
-          }
+  const timer = window.setTimeout(() => {
+    controller.abort();
+  }, 120000);
 
-          loadedImageCount++;
-          updateLoadingProgress();
-        }
-      }
-
-      await Promise.all(
-        Array.from({ length: 6 }, () => worker())
-      );
-
-      if (failedImageCount > 0) {
-        loadingMessage.textContent =
-          `${failedImageCount} image(s) could not be loaded. ` +
-          "You can still open the page ♡";
-      } else {
-        loadingMessage.textContent =
-          "Everything is ready for you ♡";
-      }
-
-      loadingStart.hidden = false;
-    }
-
-    loadingStart.addEventListener("click", () => {
-      document.body.classList.remove("is-loading");
-      loadingScreen.hidden = true;
-
-      window.scrollTo(0, 0);
-
-      updatePhotoAnimations();
-      updateProgressBar();
-
-      // The button tap gives the browser a chance to start music.
-      tryPlayingMusic();
-
-      // Begin scrolling three seconds after opening.
-      if (!prefersReducedMotion) {
-        autoScrollStartTimer = window.setTimeout(() => {
-          autoScrollStartTimer = null;
-          startAutoScroll();
-        }, 3000);
-      }
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal
     });
 
-    loadMemories();
+    if (!response.ok) {
+      throw new Error(`Could not load ${url}`);
+    }
+
+    const blob = await response.blob();
+
+    if (blob.size === 0) {
+      throw new Error(`Empty file: ${url}`);
+    }
+
+    const objectUrl = URL.createObjectURL(blob);
+    preloadedMediaUrls.push(objectUrl);
+
+    return objectUrl;
+  } catch (error) {
+    console.warn("Media loading failed:", url, error);
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function preloadVideo(number) {
+  const video = videosToObserve[number - 1];
+
+  for (const format of videoFormats) {
+    // Skip formats the browser reports it cannot play.
+    if (!video.canPlayType(format.type)) {
+      continue;
+    }
+
+    const url = await downloadMedia(
+      `videos/${number}.${format.extension}`
+    );
+
+    if (url) {
+      video.src = url;
+      video.load();
+      return true;
+    }
+  }
+
+  // Existing video sources remain available for a later attempt.
+  return false;
+}
+
+async function preloadMusic() {
+  const url = await downloadMedia("music/bgm.wav");
+
+  if (!url) {
+    // Keep the original path so playback can be retried later.
+    return false;
+  }
+
+  music.src = url;
+  music.load();
+  return true;
+}
+
+async function loadMemories() {
+  const tasks = [
+    ...imagesToLoad.map(
+      (fileBase) => () => preloadImage(fileBase)
+    ),
+    ...Array.from(
+      { length: TOTAL_VIDEOS },
+      (_, index) => () => preloadVideo(index + 1)
+    ),
+    () => preloadMusic()
+  ];
+
+  let nextTask = 0;
+
+  // Six downloads at a time.
+  async function worker() {
+    while (nextTask < tasks.length) {
+      const task = tasks[nextTask++];
+
+      let success = false;
+
+      try {
+        success = await task();
+      } catch (error) {
+        console.warn("Loading task failed:", error);
+      }
+
+      markCompleted(success);
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: 6 }, () => worker())
+  );
+
+  if (failedItems > 0) {
+    loadingMessage.textContent =
+      `${failedItems} item(s) could not be fully loaded. ` +
+      "You can still open the page and try them ♡";
+  } else {
+    loadingMessage.textContent =
+      "Everything is ready for you ♡";
+  }
+
+  loadingStart.hidden = false;
+}
+
+loadingStart.addEventListener("click", () => {
+  document.body.classList.remove("is-loading");
+  loadingScreen.hidden = true;
+
+  window.scrollTo(0, 0);
+
+  updatePhotoAnimations();
+  updateProgressBar();
+
+  // Start the song from this user tap.
+  tryPlayingMusic();
+
+  // Begin scrolling three seconds after opening.
+  if (!prefersReducedMotion) {
+    autoScrollStartTimer = window.setTimeout(() => {
+      autoScrollStartTimer = null;
+      startAutoScroll();
+    }, 3000);
+  }
+});
+
+loadMemories();
   </script>
 </body>
 </html>
